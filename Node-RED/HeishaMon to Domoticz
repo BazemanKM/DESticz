@@ -1,0 +1,279 @@
+[
+    {
+        "id": "0ba9f5fb8f1d2cb8",
+        "type": "tab",
+        "label": "HeishaMon",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "264f914f269489f3",
+        "type": "mqtt in",
+        "z": "0ba9f5fb8f1d2cb8",
+        "name": "MQTT HeishaSensor",
+        "topic": "panasonic_heat_pump/#",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "92e5b2c.00a8b5",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 200,
+        "y": 300,
+        "wires": [
+            [
+                "51bc2dfc2e849685"
+            ]
+        ]
+    },
+    {
+        "id": "51bc2dfc2e849685",
+        "type": "function",
+        "z": "0ba9f5fb8f1d2cb8",
+        "name": "Map sensor to ID",
+        "func": "// if there's an entry in the global defined variable then \n// the value needs to be saved (send) to next function \nvar sensorsplit = msg.topic.split(\"/\");\nvar sensor = sensorsplit[sensorsplit.length-1];\n \nvar sensorvalue = msg.payload;\nfor (i = 0; i < context.global.heishamon.SensorMapping.length; i++) {\n    // when sensor is in the global settings \n    msg.sensor = sensor;\n    if(sensor == context.global.heishamon.SensorMapping[i][0]){\n//        node.warn(context.global.heishamon.SensorMapping[i]);\n        // add the home automation ID/name \n        msg.HAid = context.global.heishamon.SensorMapping[i][1];\n\n        // add type (if it exists):\n        if(context.global.heishamon.SensorMapping[i][2]){\n            msg.type = context.global.heishamon.SensorMapping[i][2];\n        }    \n        return msg;\n    }\n}\nreturn;",
+        "outputs": 1,
+        "noerr": 7,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 300,
+        "wires": [
+            [
+                "9f5e2bb03ea42fda"
+            ]
+        ]
+    },
+    {
+        "id": "34fb3c7996a2837e",
+        "type": "function",
+        "z": "0ba9f5fb8f1d2cb8",
+        "name": "global setup",
+        "func": "if (!context.global.heishamon) {\n  context.global.heishamon = {};\n}\n\n//This is the overview of sensors which has to be sent to the Home Automation system\ncontext.global.heishamon.SensorMapping = [\n        // [\"name of topic\", \"IDx in Domoticz/Name in Home Assistant/ ?? openHAB ??\"]\n            [\"Heatpump_State\", 1, \"Switch\"],\n            [\"Pump_Flow\", 2],\n            [\"Force_DHW_State\", 27, \"Switch\"], //DHW status (20=off, 10=on 0=unknown)\n        //    [\"Quiet_Mode_Schedule\", null, \"Switch\"],\n            [\"Operating_Mode_State\", 4, \"Selector Switch\"], //7 levels - (0=Heat only, 10=Cool only, 20=Auto, 30=DHW only, 40=Heat+DHW, 50=Cool+DHW, 60=Auto+DHW)\n            [\"Main_Inlet_Temp\", 5],\n            [\"Main_Outlet_Temp\", 6], \n            [\"Main_Target_Temp\", 7],\n            [\"Compressor_Freq\", 8],\n            [\"DHW_Target_Temp\", 9],\n            [\"DHW_Temp\", 10],\n            [\"Operations_Hours\", 11],\n            [\"Operations_Counter\", 12],\n        //    [\"Main_Schedule_State\", null, \"Switch\"],\n            [\"Outside_Temp\", 13],\n            [\"Heat_Energy_Production\", 56],\n            [\"Heat_Energy_Consumption\", 47],\n            [\"Powerful_Mode_Time\", 18, \"Selector Switch\"], //  4 levels -- 0= off - 10= 30 Minute - 20= 60 Minute - 30= 90 Minute //0= off, 30 = level 3\n            [\"Quiet_Mode_Level\", 19, \"Selector Switch\"], // 4 levels -- 0= off - 10= Silent 1 - 20= Silent 2 - 30= Silent 3\n            [\"Holiday_Mode_State\", 55, \"Switch\"],\n            [\"ThreeWay_Valve_State\", 21, \"Selector Switch\"], // 2 levels -- 0=Room, 10=DHW\n        //    [\"Outside_Pipe_Temp\", null],\n        //    [\"DHW_Heat_Delta\", null],\n        //    [\"Heat_Delta\", null],\n        //    [\"Cool_Delta\", null],\n        //    [\"DHW_Holiday_Shift_Temp\", null],\n        //    [\"Defrosting_State\", null, \"Switch\"],\n            [\"Z1_Heat_Request_Temp\", 57, \"Thermostat\"],\n        //    [\"Z1_Cool_Request_Temp\", null],\n        //    [\"Z1_Heat_Curve_Target_High_Temp\", null],\n        //    [\"Z1_Heat_Curve_Target_Low_Temp\", null],\n        //    [\"Z1_Heat_Curve_Outside_High_Temp\", null],\n        //    [\"Z1_Heat_Curve_Outside_Low_Temp\", null],\n        //    [\"Room_Thermostat_Temp\", null],\n        //    [\"Z2_Heat_Request_Temp\", null],\n        //    [\"Z2_Cool_Request_Temp\", null],\n        //    [\"Z1_Water_Temp\", null],\n        //    [\"Z2_Water_Temp\", null],\n        //    [\"Cool_Energy_Production\", null],\n        //    [\"Cool_Energy_Consumption\", null],\n            [\"DHW_Energy_Production\", 31],\n            [\"DHW_Energy_Consumption\", 48],\n        //    [\"Z1_Water_Target_Temp\", null],\n        //    [\"Z2_Water_Target_Temp\", null],\n            [\"Error\", 25],\n        //    [\"Room_Holiday_Shift_Temp\", null],\n        //    [\"Buffer_Temp\", null],\n            [\"Solar_Temp\", 26],\n        //    [\"Pool_Temp\", null],\n        //    [\"Main_Hex_Outlet_Temp\", null],\n        //    [\"Discharge_Temp\", null],\n        //    [\"Inside_Pipe_Temp\", null],\n        //    [\"Defrost_Temp\", null],\n        //    [\"Eva_Outlet_Temp\", null],\n        //    [\"Bypass_Outlet_Temp\", null],\n        //    [\"Ipm_Temp\", null],\n        //    [\"Z1_Temp\", null],\n        //    [\"Z2_Temp\", null],\n        //    [\"DHW_Heater_State\", null],\n        //    [\"Room_Heater_State\", null],\n        //    [\"Internal_Heater_State\", null],\n        //    [\"External_Heater_State\", null],\n        //    [\"Fan1_Motor_Speed\", null],\n        //    [\"Fan2_Motor_Speed\", null],\n        //    [\"High_Pressure\", null],\n        //    [\"Pump_Speed\", null],\n        //    [\"Low_Pressure\", null],\n        //    [\"Compressor_Current\", null],\n        //    [\"Force_Heater_State\", null, \"Switch\"],\n        //    [\"Sterilization_State\", null, \"Switch\"],\n        //    [\"Sterilization_Temp\", null],\n        //    [\"Sterilization_Max_Time\", null],\n        //    [\"Z1_Cool_Curve_Target_High_Temp\", null],\n        //    [\"Z1_Cool_Curve_Target_Low_Temp\", null],\n        //    [\"Z1_Cool_Curve_Outside_High_Temp\", null],\n        //    [\"Z1_Cool_Curve_Outside_Low_Temp\", null],\n        //    [\"Heating_Mode\", null],\n        //    [\"Heating_Off_Outdoor_Temp\", null],\n        //    [\"Heater_On_Outdoor_Temp\", null],\n        //    [\"Heat_To_Cool_Temp\", null],\n        //    [\"Cool_To_Heat_Temp\", null],\n        //    [\"Cooling_Mode\", null],\n        //    [\"Heat_To_Cool_Temp\", null],\n        //    [\"Z2_Heat_Curve_Target_High_Temp\", null],\n        //    [\"Z2_Heat_Curve_Target_Low_Temp\", null],\n        //    [\"Z2_Heat_Curve_Outside_High_Temp\", null],\n        //    [\"Z2_Heat_Curve_Outside_Low_Temp\", null],\n        //    [\"Z2_Cool_Curve_Target_High_Temp\", null],\n        //    [\"Z2_Cool_Curve_Target_Low_Temp\", null],\n        //    [\"Z2_Cool_Curve_Outside_High_Temp\", null],\n        //    [\"Z2_Cool_Curve_Outside_Low_Temp\", null],\n        //    [\"Room_Heater_Operations_Hours\", null],\n        //    [\"DHW_Heater_Operations_Hours\", null]\n    ];\n    \ncontext.global.heishamon.ActionMapping = [\n    // actioncommand, type, \"IDx in Domoticz/Name in Home Assistant/ ?? openHAB ??\" \n    [\"SetHeatpump\", \"Switch\", 1],\n    [\"SetHoliday\", \"Switch\", 20],\n    [\"SetQuietMode\", \"Selector Switch\", 19],\n    [\"SetPowerfull\", \"Selector Switch\", 18],\n    [\"SetZ1HeatRequestTemperature\", \"Thermostat\", 57],\n //   [\"SetZ1CoolRequestTemperature\", \"Thermostat\", null],\n //   [\"SetZ2HeatRequestTemperature\", \"Thermostat\", null],\n //   [\"SetZ2CoolRequestTemperature\", \"Thermostat\", null],\n    [\"SetOperationMode\", \"Selector Switch\", 4],\n    [\"SetForceDHW\", \"Switch\", 27],\n    [\"SetDHWTemp\", \"Thermostat\", 9],\n //   [\"SetCoolTemp\", \"Thermostat\", null],\n //  [\"SetForceDefrost\", \"Switch\", null],\n    [\"SetForceSterilization\", \"Switch\", 28]\n];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 1,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7af5b7b1bcf27509",
+        "type": "inject",
+        "z": "0ba9f5fb8f1d2cb8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload",
+                "v": "",
+                "vt": "date"
+            },
+            {
+                "p": "topic",
+                "v": "Startup",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "Startup",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 120,
+        "wires": [
+            [
+                "34fb3c7996a2837e"
+            ]
+        ]
+    },
+    {
+        "id": "9f5e2bb03ea42fda",
+        "type": "function",
+        "z": "0ba9f5fb8f1d2cb8",
+        "name": "Prepare Domoticz output",
+        "func": "if(msg.HAid !== null){\n    msg1 = {};\n    msg1.payload = {};\n    msg1.payload.idx = msg.HAid; \n    msg1.topic = \"domoticz/in\";\n\n    if(msg.type == \"Selector Switch\"){\n        msg1.payload.command = \"switchlight\";\n        msg1.payload.switchcmd = \"Set Level\";\n        msg1.payload.level = msg.payload * 10;\n    }else if(msg.type == \"Switch\"){\n        msg1.payload.command = \"switchlight\"\n        if(msg.payload == 1){ cmd = \"On\"; }else{ cmd=\"Off\"}\n        msg1.payload.switchcmd = cmd;\n    }else{\n        msg1.payload.svalue = msg.payload;\n    }\n    return msg1;\n}\n\nreturn;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1050,
+        "y": 260,
+        "wires": [
+            [
+                "03faa9df4a7ad16c",
+                "6398f06f9e301172"
+            ]
+        ]
+    },
+    {
+        "id": "03faa9df4a7ad16c",
+        "type": "mqtt out",
+        "z": "0ba9f5fb8f1d2cb8",
+        "name": "MQTT publish",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "92e5b2c.00a8b5",
+        "x": 1360,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "23a164325d70f4d5",
+        "type": "mqtt in",
+        "z": "0ba9f5fb8f1d2cb8",
+        "name": "Domoticz Publish",
+        "topic": "domoticz/out/#",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "92e5b2c.00a8b5",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 180,
+        "y": 660,
+        "wires": [
+            [
+                "636026cef5c4d5f2"
+            ]
+        ]
+    },
+    {
+        "id": "552e280049d45606",
+        "type": "debug",
+        "z": "0ba9f5fb8f1d2cb8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 1040,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "636026cef5c4d5f2",
+        "type": "json",
+        "z": "0ba9f5fb8f1d2cb8",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 390,
+        "y": 660,
+        "wires": [
+            [
+                "16b6d2cda78fb067"
+            ]
+        ]
+    },
+    {
+        "id": "16b6d2cda78fb067",
+        "type": "function",
+        "z": "0ba9f5fb8f1d2cb8",
+        "name": "Translate HomeAutomation to Heishamon",
+        "func": "//node.warn(msg.payload.idx)\nvar type;\n\nfor (i = 0; i < context.global.heishamon.ActionMapping.length; i++) {\n    if(msg.payload.idx == context.global.heishamon.ActionMapping[i][2]){\n        if(context.global.heishamon.ActionMapping[i][1]){\n            msg.topic = \"panasonic_heat_pump/commands/\" + context.global.heishamon.ActionMapping[i][0];\n            type = context.global.heishamon.ActionMapping[i][1];\n            //node.warn(msg.payload);\n            switch(type){\n                case \"Selector Switch\":\n                    msg.payload = (msg.payload.svalue1 / 10);\n                    return msg;\n                case \"Thermostat\":\n                    msg.payload = parseInt(msg.payload.svalue1);\n                    return msg;\n                case \"Switch\":\n                    msg.payload = msg.payload.nvalue;\n                    return msg;\n            }\n\n        }\n    }\n}\n\nreturn;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 660,
+        "wires": [
+            [
+                "552e280049d45606",
+                "a68ec3303c244fd5"
+            ]
+        ]
+    },
+    {
+        "id": "a68ec3303c244fd5",
+        "type": "mqtt out",
+        "z": "0ba9f5fb8f1d2cb8",
+        "name": "MQTT Publish Set-command",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "92e5b2c.00a8b5",
+        "x": 1320,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "6398f06f9e301172",
+        "type": "debug",
+        "z": "0ba9f5fb8f1d2cb8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 1350,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "49dd011af5e17151",
+        "type": "comment",
+        "z": "0ba9f5fb8f1d2cb8",
+        "name": "Version 03",
+        "info": "Only the 'global setup' node needs to be changed (and if you're not running on localhost you need to change those mqtt connection nodes also). ",
+        "x": 160,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "92e5b2c.00a8b5",
+        "type": "mqtt-broker",
+        "name": "MQTT (localhost)",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "Node_Red_Client",
+        "usetls": false,
+        "compatmode": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    }
+]
