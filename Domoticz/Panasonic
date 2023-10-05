@@ -1,0 +1,72 @@
+return {
+
+    on = {
+        devices = {'DHW verbruik','Verwarming verbruik','Pomp','Verwarming productie','DHW productie'}
+        
+         },
+    
+    execute = function(domoticz, item)
+        
+        local Tapwaterverbruik = domoticz.devices('DHW verbruik')
+        local Tapwaterproductie = domoticz.devices('DHW productie')
+        local Verwarmingverbruik = domoticz.devices('Verwarming verbruik')
+        local Verwarmingproductie = domoticz.devices('Verwarming productie')
+        local Verbruik = domoticz.devices('Verbruik')
+        local Productie = domoticz.devices('Productie')
+        local COP = domoticz.devices('COP')
+        local COPberekend = domoticz.devices('COP berekend')
+        local Flow = domoticz.devices('Pomp')
+        local Tuit = domoticz.devices('Uitlaat')
+        local Tin = domoticz.devices('Inlaat')
+        local DeltaT = domoticz.devices('Panasonic DeltaT')
+--        local WPverbruik = domoticz.devices(295)
+--        local WPverbruikb = domoticz.devices(294)
+        
+        -- Generation
+        local EnergyGeneration1 = Tapwaterproductie.rawData[2]
+        local PowerGeneration1 = Tapwaterproductie.rawData[1]
+        local EnergyGeneration2 = Verwarmingproductie.rawData[2]
+        local PowerGeneration2 = Verwarmingproductie.rawData[1]
+        
+        -- Consumption
+        local EnergyConsumption1 = Tapwaterverbruik.rawData[2]
+        local PowerConsumption1 = Tapwaterverbruik.rawData[1]
+        local EnergyConsumption2 = Verwarmingverbruik.rawData[2]
+        local PowerConsumption2 = Verwarmingverbruik.rawData[1]
+--        local EnergyConsumption3 = WPverbruik.rawData[2]
+--        local PowerConsumption3 = WPverbruik.rawData[1]
+--        local EnergyConsumption4 = WPverbruikb.rawData[2]
+--        local PowerConsumption4 = WPverbruikb.rawData[1]
+        
+        local Tin = Tin.rawData[1]
+        local Tuit = Tuit.rawData[1]
+        local Flow = Flow.rawData[1]
+
+        --Calculate
+        local EnergyGeneration = EnergyGeneration1 + EnergyGeneration2
+        local PowerGeneration = PowerGeneration1 + PowerGeneration2
+        local EnergyConsumption = EnergyConsumption1 + EnergyConsumption2
+        local PowerConsumption = PowerConsumption1 + PowerConsumption2
+--        local EnergieVerbruik = EnergyConsumption3 + EnergyConsumption4
+--        local StroomVerbruik = PowerConsumption3 + PowerConsumption4
+        local COP = PowerGeneration / PowerConsumption
+        local DeltaT = Tuit - Tin
+        local COPberekend = (Flow / 60) * 4.2 * DeltaT
+
+        --domoticz.log('EnergyGeneration ' .. EnergyGeneration .. ' Wh ', domoticz.LOG_INFO)
+        --domoticz.log('PowerGeneration ' .. PowerGeneration .. ' W ', domoticz.LOG_INFO)
+        --domoticz.log('EnergyConsumption ' .. EnergyConsumption .. ' Wh ', domoticz.LOG_INFO)
+        --domoticz.log('PowerConsumption: ' .. PowerConsumption .. ' W ', domoticz.LOG_INFO)
+        --domoticz.log('COP: ' .. COP .. ' W/W ', domoticz.LOG_INFO)
+        --domoticz.log('COPberekend: ' .. COPberekend .. ' W/W ', domoticz.LOG_INFO)
+        
+        domoticz.openURL('http://127.0.0.1:8080/json.htm?type=command&param=udevice&idx=49'..'&nvalue=0&svalue='..PowerConsumption..';'..EnergyConsumption)
+        domoticz.openURL('http://127.0.0.1:8080/json.htm?type=command&param=udevice&idx=50'..'&nvalue=0&svalue='..PowerGeneration..';'..EnergyGeneration)
+        domoticz.openURL('http://127.0.0.1:8080/json.htm?type=command&param=udevice&idx=51'..'&nvalue=0&svalue='..COP..';'..COP)
+        domoticz.openURL('http://127.0.0.1:8080/json.htm?type=command&param=udevice&idx=52'..'&nvalue=0&svalue='..DeltaT..';'..DeltaT)
+        domoticz.openURL('http://127.0.0.1:8080/json.htm?type=command&param=udevice&idx=53'..'&nvalue=0&svalue='..COPberekend..';'..COPberekend)
+--        domoticz.openURL('http://127.0.0.1:8080/json.htm?type=command&param=udevice&idx=302'..'&nvalue=0&svalue='..StroomVerbruik..';'..EnergieVerbruik)
+        
+    end
+    
+}
