@@ -1,4 +1,5 @@
-sudo cloudflared service install
+sudo cloudflared service uninstall
+sudo cloudflared service install CODE
 
 WiFi netwerk gebruiker (voor Heishamon)
 Router login
