@@ -1,0 +1,485 @@
+[
+    {
+        "id": "c98a6e84.07966",
+        "type": "tab",
+        "label": "WP eigen",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "1b140c825df45585",
+        "type": "junction",
+        "z": "c98a6e84.07966",
+        "x": 500,
+        "y": 400,
+        "wires": [
+            [
+                "6892585586a399f1"
+            ]
+        ]
+    },
+    {
+        "id": "737aa6fd.c0bbd8",
+        "type": "mqtt in",
+        "z": "c98a6e84.07966",
+        "name": "Domoticz Gemiddelde kamertemperatuur",
+        "topic": "domoticz/out/331",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "4d2ff189.666908",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 260,
+        "y": 100,
+        "wires": [
+            [
+                "c38c10aa944804da"
+            ]
+        ]
+    },
+    {
+        "id": "ddce2add.a6e758",
+        "type": "mqtt in",
+        "z": "c98a6e84.07966",
+        "name": "Gemiddelde buitentemperatuur",
+        "topic": "domoticz/out/640",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "4d2ff189.666908",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 230,
+        "y": 160,
+        "wires": [
+            [
+                "9f168ee3e29ba512"
+            ]
+        ]
+    },
+    {
+        "id": "ade9a826.da6908",
+        "type": "mqtt in",
+        "z": "c98a6e84.07966",
+        "name": "P1 verbruik/consumption",
+        "topic": "domoticz/out/35",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "4d2ff189.666908",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 210,
+        "y": 220,
+        "wires": [
+            [
+                "3da545fc1ccf9429"
+            ]
+        ]
+    },
+    {
+        "id": "7e9393f.a80ed6c",
+        "type": "mqtt in",
+        "z": "c98a6e84.07966",
+        "name": "P1 production",
+        "topic": "domoticz/out/35",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "4d2ff189.666908",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 170,
+        "y": 280,
+        "wires": [
+            [
+                "93a0a11fcacdcd9a"
+            ]
+        ]
+    },
+    {
+        "id": "3da545fc1ccf9429",
+        "type": "link out",
+        "z": "c98a6e84.07966",
+        "name": "link out 77",
+        "mode": "link",
+        "links": [
+            "7559389970f919c5"
+        ],
+        "x": 515,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "c38c10aa944804da",
+        "type": "link out",
+        "z": "c98a6e84.07966",
+        "name": "link out 78",
+        "mode": "link",
+        "links": [
+            "258b2cfa45727e1d"
+        ],
+        "x": 515,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "9f168ee3e29ba512",
+        "type": "link out",
+        "z": "c98a6e84.07966",
+        "name": "link out 79",
+        "mode": "link",
+        "links": [
+            "865f73de46d93700"
+        ],
+        "x": 515,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "a15f4be62375883c",
+        "type": "link out",
+        "z": "c98a6e84.07966",
+        "name": "link out 80",
+        "mode": "link",
+        "links": [
+            "4005ad2197c7fdc7"
+        ],
+        "x": 795,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "93a0a11fcacdcd9a",
+        "type": "json",
+        "z": "c98a6e84.07966",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 370,
+        "y": 280,
+        "wires": [
+            [
+                "19464d9b6dcf1655"
+            ]
+        ]
+    },
+    {
+        "id": "8f626ae64fb064aa",
+        "type": "debug",
+        "z": "c98a6e84.07966",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 440,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "19464d9b6dcf1655",
+        "type": "function",
+        "z": "c98a6e84.07966",
+        "name": "",
+        "func": "var temp = msg.payload.svalue6;\nreturn[{payload:temp}]",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 280,
+        "wires": [
+            [
+                "8f626ae64fb064aa",
+                "a15f4be62375883c"
+            ]
+        ]
+    },
+    {
+        "id": "6c473914d362f332",
+        "type": "ui_date_picker",
+        "z": "c98a6e84.07966",
+        "name": "",
+        "label": "",
+        "group": "26a0b325142203b8",
+        "order": 3,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 310,
+        "y": 480,
+        "wires": [
+            [
+                "15542fb7647aec4c"
+            ]
+        ]
+    },
+    {
+        "id": "15542fb7647aec4c",
+        "type": "moment",
+        "z": "c98a6e84.07966",
+        "name": "",
+        "topic": "EndHolidayOn",
+        "input": "payload",
+        "inputType": "msg",
+        "inTz": "Europe/Amsterdam",
+        "adjAmount": 0,
+        "adjType": "days",
+        "adjDir": "add",
+        "format": "DD/MM/YYYY",
+        "locale": "en-US",
+        "output": "payload",
+        "outputType": "msg",
+        "outTz": "Europe/Amsterdam",
+        "x": 500,
+        "y": 480,
+        "wires": [
+            [
+                "e1b295d57cbdc9c3"
+            ]
+        ]
+    },
+    {
+        "id": "460de01d24a9e6b7",
+        "type": "moment",
+        "z": "c98a6e84.07966",
+        "name": "",
+        "topic": "CurrentDate",
+        "input": "payload",
+        "inputType": "msg",
+        "inTz": "Europe/Amsterdam",
+        "adjAmount": 0,
+        "adjType": "days",
+        "adjDir": "add",
+        "format": "DD/MM/YYYY",
+        "locale": "en-US",
+        "output": "payload",
+        "outputType": "msg",
+        "outTz": "Europe/Amsterdam",
+        "x": 510,
+        "y": 520,
+        "wires": [
+            [
+                "e1b295d57cbdc9c3"
+            ]
+        ]
+    },
+    {
+        "id": "bd69c6840380e05e",
+        "type": "inject",
+        "z": "c98a6e84.07966",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "00 09 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 520,
+        "wires": [
+            [
+                "460de01d24a9e6b7"
+            ]
+        ]
+    },
+    {
+        "id": "fe504acad45be5c4",
+        "type": "ui_text",
+        "z": "c98a6e84.07966",
+        "group": "26a0b325142203b8",
+        "order": 2,
+        "width": 2,
+        "height": 1,
+        "name": "",
+        "label": "Date",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 150,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "b45413bceb5600d3",
+        "type": "ui_text",
+        "z": "c98a6e84.07966",
+        "group": "26a0b325142203b8",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "Execution time is 09:00",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 210,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "e1b295d57cbdc9c3",
+        "type": "function",
+        "z": "c98a6e84.07966",
+        "name": "function 30",
+        "func": "if (msg.topic == 'EndHolidayOn') {\n    flow.set('EndHolidayOn',msg.payload,\"file\") ;\n    return null\n}\n\nif (msg.topic == 'EndHolidayOn_state') {\n    flow.set('EndHolidayOn_state',msg.payload,\"file\") ;\n    return null\n}\n\nvar EndHolidayOn_state = flow.get('EndHolidayOn_state',\"file\");\nvar EndHolidayOn = flow.get('EndHolidayOn',\"file\");\n    \nif (EndHolidayOn === undefined || EndHolidayOn_state === undefined || EndHolidayOn_state == 0) { return null }\n\nif (msg.topic == 'CurrentDate' && msg.payload == EndHolidayOn) {\n    msg.payload = 0;\n    node.send(msg);\n\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 480,
+        "wires": [
+            [
+                "6058e279fd740bb2"
+            ]
+        ]
+    },
+    {
+        "id": "6892585586a399f1",
+        "type": "ui_switch",
+        "z": "c98a6e84.07966",
+        "name": "",
+        "label": "Enable function",
+        "tooltip": "",
+        "group": "26a0b325142203b8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "true",
+        "topic": "EndHolidayOn_state",
+        "topicType": "str",
+        "style": "",
+        "onvalue": "1",
+        "onvalueType": "num",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "0",
+        "offvalueType": "num",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 500,
+        "y": 440,
+        "wires": [
+            [
+                "e1b295d57cbdc9c3",
+                "1b140c825df45585"
+            ]
+        ]
+    },
+    {
+        "id": "6058e279fd740bb2",
+        "type": "mqtt out",
+        "z": "c98a6e84.07966",
+        "name": "SET2 SetHolidayMode",
+        "topic": "panasonic_heat_pump/commands/SetHolidayMode",
+        "qos": "0",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "92e5b2c.00a8b5",
+        "x": 960,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "4d2ff189.666908",
+        "type": "mqtt-broker",
+        "name": "192.168.2.4",
+        "broker": "192.168.2.4",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "verifyservercert": true,
+        "protocolVersion": "4",
+        "keepalive": "15",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "26a0b325142203b8",
+        "type": "ui_group",
+        "name": "End holiday mode",
+        "tab": "ac594a9d775ca4fb",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "92e5b2c.00a8b5",
+        "type": "mqtt-broker",
+        "name": "MQTT (192.168.2.4)",
+        "broker": "192.168.2.4",
+        "port": "1883",
+        "clientid": "Node_Red_Client",
+        "autoConnect": true,
+        "usetls": false,
+        "compatmode": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "ac594a9d775ca4fb",
+        "type": "ui_tab",
+        "name": "Scheduler",
+        "icon": "schedule",
+        "order": 10,
+        "disabled": false,
+        "hidden": false
+    }
+]
