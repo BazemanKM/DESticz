@@ -1,0 +1,27 @@
+return {
+
+    on = {
+        devices = { 
+                    497,
+                    321
+                  }
+         },
+    logging = {
+        level = domoticz.LOG_INFO,
+--        level = domoticz.LOG_ERROR,
+        marker = "Gemiddelde"
+               },    
+    
+    execute = function(domoticz, item)
+        
+        local kamer1 = domoticz.devices(497)
+        local kamer2 = domoticz.devices(321)
+        
+        --Calculate
+        local Gemiddelde = (kamer1 + kamer2) / 2
+        
+        domoticz.openURL('http://127.0.0.1:8080/json.htm?type=command&param=udevice&idx=96'..'&nvalue=0&svalue='..Gemiddelde..';'..Gemiddelde)
+        
+    end
+    
+}
