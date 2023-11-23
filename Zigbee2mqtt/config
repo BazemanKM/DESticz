@@ -1,0 +1,11 @@
+mqtt:
+  base_topic: zigbee2mqtt
+  server: mqtt://localhost
+serial:
+  port: /dev/ttyUSB0
+frontend:
+  port: 8085
+permit_join: true
+homeassistant:
+  discovery_topic: homeassistant
+  status_topic: homeassistant/status
