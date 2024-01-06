@@ -1,0 +1,20 @@
+return {
+   on = {
+      devices = {'Weeralarm'}
+   },
+   data    = {
+      LastWeeralarm = { initial = '' },
+   },
+   execute = function(domoticz)
+        local Weeralarm = domoticz.devices('Weeralarm')
+        local teleTok   = 'API'
+        local chatId    = 'ChatId'
+
+        if domoticz.data.LastWeeralarm ~= Weeralarm.state then
+            os.execute('curl -s -X POST "https://api.telegram.org/bot'..teleTok..'/sendMessage" -d chat_id='..chatId..' -d text="'..Weeralarm.state..'"')
+            domoticz.data.LastWeeralarm = 'Weeralarm.state'
+        
+      end
+
+   end
+}
