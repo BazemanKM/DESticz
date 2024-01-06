@@ -3,22 +3,12 @@ sudo cloudflared service install CODE
 
 WiFi netwerk gebruiker (voor Heishamon)
 Router login
-SSH poort 22 forward
-
-IP adres vast op DESticz Pi. 
-Range IP adres instellen in Domoticz
-https://pimylifeup.com/raspberry-pi-static-ip-address/
-https://colandino.nl/raspberry-pi-buster-vast-ip-adres-geven/
-
-ifconfig
-ip r | grep default
-sudo nano /etc/resolv.conf
-sudo nano /etc/dhcpcd.conf
-sudo reboot
 
 Heishamon instellen naar MQTT
-In Node RED MQTT Heishamon terug op localhost zetten.
+In Node RED MQTT Heishamon terug op localhost zetten
+IP adres(sen) Heishamon
 
 Domoticz instellen op juiste locatie
 
 update Heishamon
+1-wire
