@@ -1,0 +1,21 @@
+return {
+	on = {
+		devices = {'Foutmelding'}
+	},
+	
+	execute = function(domoticz)
+        local Foutmelding = domoticz.devices('Foutmelding')
+        local teleTok   = 'API'
+        local chatId    = 'chatId'
+        local Reset = domoticz.devices('Reset')
+        local WP = domoticz.devices('Warmtepomp')
+        
+        if Foutmelding.state ~= 'No error' then
+            os.execute('curl -s -X POST "https://api.telegram.org/bot'..teleTok..'/sendMessage" -d chat_id='..chatId..' -d text="Foutmelding Biks! '..Foutmelding.state..'"')
+            Reset.switchOn()
+            WP.switchOn().afterMin(2)
+            Reset.switchOff().afterMin(2)
+        end
+
+	end
+}
