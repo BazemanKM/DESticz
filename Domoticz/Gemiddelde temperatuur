@@ -2,10 +2,12 @@ return {
 
     on = {
         devices = { 
-                    497,
-                    321
-                  }
+                    98,
+                    99
+                  },
+        timer = {'every 5 minutes '},     
          },
+     
     logging = {
         level = domoticz.LOG_INFO,
 --        level = domoticz.LOG_ERROR,
@@ -14,8 +16,8 @@ return {
     
     execute = function(domoticz, item)
         
-        local kamer1 = domoticz.devices(497)
-        local kamer2 = domoticz.devices(321)
+        local kamer1 = domoticz.devices(98).rawData[1]
+        local kamer2 = domoticz.devices(99).rawData[1]
         
         --Calculate
         local Gemiddelde = (kamer1 + kamer2) / 2
