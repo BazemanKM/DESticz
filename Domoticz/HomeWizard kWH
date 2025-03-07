@@ -1,0 +1,31 @@
+return {
+    active = true, -- Optioneel
+    on = {
+        timer = { 'every 5 minutes' },
+        httpResponses = { 'growattdataready' }
+    },
+    execute = function(domoticz, response)
+        if response.isTimer then
+            domoticz.openURL({
+                url = 'http://IPARESSS/api/v1/data',
+                callback = 'growattdataready'
+            })
+            domoticz.log('Growatt data requested', domoticz.LOG_INFO)
+            return
+        end
+
+        if response.isHTTPResponse and response.ok then
+            if response.isJSON and response.json.active_power_w and response.json.total_power_export_kwh then
+                local activePower = response.json.active_power_w * -1
+                local totalPower = response.json.total_power_export_kwh * 1000 + 12610900
+                
+                domoticz.devices('Solar Power').updateElectricity(activePower, totalPower)
+                domoticz.log('Growatt Power / Counter: ' .. activePower .. ' / ' .. totalPower, domoticz.LOG_INFO)
+            else
+                domoticz.log('Growatt Data Error: Ongeldige JSON-gegevens ontvangen', domoticz.LOG_ERROR)
+            end
+        elseif response.isHTTPResponse then
+            domoticz.log('Growatt Data Error: HTTP-verzoek mislukt', domoticz.LOG_ERROR)
+        end
+    end
+}
