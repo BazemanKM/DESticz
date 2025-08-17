@@ -1,0 +1,92 @@
+return {
+    on = {
+        timer = {'20 minutes before sunset','20 minutes after sunrise','30 minutes before sunset','at 22:30','at 22:45','at 6:00','at 7:45'},
+        devices = {'Trap onder','Trap boven','Trap zolder','Gang','Voordeur','Lichtsensor','Keuken','Woonkamer','Bijkeuken','Vakantie'}
+    },
+
+    execute = function(domoticz, item, info, timer, device, group)
+        local Time = require('Time')
+        local currentTime = Time()
+        
+        -- Bewegingssensoren en apparaten
+        local motionGang = domoticz.devices('Gang')
+        local motionBijkeuken = domoticz.devices('Bijkeuken')  
+        local motionKeuken = domoticz.devices('Keuken')
+        local motionWoonkamer = domoticz.devices('Woonkamer')
+        local onder = domoticz.devices('Trap onder')
+        local boven = domoticz.devices('Trap boven')
+        local zolder = domoticz.devices('Trap zolder')
+        local myTVKijken = domoticz.devices('TV Kijken')
+        local mySchemer = domoticz.devices('Lichtsensor')
+        local vakantie = domoticz.devices('Vakantie')
+        local trap = domoticz.devices('WLED Trap - Color & Brightness')
+        local lightDressoir = domoticz.devices('Krukje')
+        local lightBuffetkast = domoticz.devices('Buffetkast')
+        local lightKeukenSpots = domoticz.devices('Keuken spots')
+        local lightAanrecht = domoticz.devices('Aanrecht')
+        local lightKeukenkast = domoticz.devices('Keukenkast')
+        local lightVoordeur = domoticz.devices('Wandlamp')
+        local lightOverloop = domoticz.devices('Overloop zolder')
+        
+        -- Algemene verlichting
+        if currentTime.matchesRule("between 20 minutes after sunrise and 20 minutes before sunset") then
+            if mySchemer.state == 'Off' then
+                lightKeukenSpots.dimTo(0)
+                lightVoordeur.switchOff()
+                lightDressoir.switchOff()
+                lightBuffetkast.switchOff()
+                lightAanrecht.switchOff()
+                lightKeukenkast.switchOff()
+                lightKeukenSpots.dimTo(0)
+            else
+                lightKeukenSpots.dimTo(35)
+                lightVoordeur.switchOn()
+                lightDressoir.switchOn()
+                lightBuffetkast.dimTo(50)
+                lightAanrecht.switchOn()
+                lightKeukenkast.switchOn()
+                lightKeukenSpots.dimTo(35)
+            end
+        elseif currentTime.matchesRule("between 20 minutes before sunset and 22:45") then
+            lightKeukenSpots.dimTo(35)
+            lightVoordeur.switchOn()
+            lightDressoir.switchOn()
+            lightBuffetkast.dimTo(50)
+            lightAanrecht.switchOn()
+            lightKeukenkast.switchOn()
+            lightKeukenSpots.dimTo(35)
+        
+        elseif currentTime.matchesRule("between 22:45 and 20 minutes after sunrise") then
+            if motionKeuken.active or motionWoonkamer.active or myTVKijken.active or onder.active or motionGang.active then
+                lightKeukenSpots.dimTo(35)
+                lightVoordeur.switchOn()
+                lightDressoir.switchOn()
+                lightBuffetkast.dimTo(40)
+                lightAanrecht.switchOn()
+                lightKeukenkast.switchOn()
+                lightKeukenSpots.dimTo(35)
+            else
+                lightKeukenSpots.dimTo(0)
+                lightVoordeur.switchOff()
+                lightDressoir.switchOff()
+                lightBuffetkast.switchOff()
+                lightAanrecht.switchOff()
+                lightKeukenkast.switchOff()
+                lightKeukenSpots.dimTo(0)
+            end
+        end
+        
+        -- Overloop zolder verlichting
+        if currentTime.matchesRule("at 30 minutes before sunset") and not vakantie.active then
+            lightOverloop.switchOn()
+        elseif currentTime.matchesRule("at 7:45") or currentTime.matchesRule("between 7:45 and 30 minutes before sunset") then
+            if lightOverloop.active and not mySchemer.active then
+                lightOverloop.switchOff()
+            elseif not vakantie.active and mySchemer.active and not lightOverloop.active then
+                lightOverloop.switchOn()
+            end
+        elseif vakantie.active and lightOverloop.active then
+            lightOverloop.switchOff()
+        end
+    end
+}
