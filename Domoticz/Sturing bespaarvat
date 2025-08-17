@@ -1,0 +1,32 @@
+return {
+
+    on = {
+        devices = { 
+                    123,4,142,21 }
+    },
+    
+    execute = function(domoticz, item)
+        local Smartmeter = domoticz.devices(123)
+        local PowerExport = tonumber(Smartmeter.rawData[6]) or 0
+        local Element = domoticz.devices(142)
+        local SensorBespaarvat = tonumber(domoticz.devices(141).rawData[1]) or 0
+        local Warmtepompbedrijf = domoticz.devices('Bedrijf')
+        local Driewegklep = domoticz.devices('Driewegklep')
+        
+--        if PowerExport == 0 or SensorBespaarvat == 0 then
+--            domoticz.log('Waarschuwing: PowerExport of SensorBespaarvat is 0 of niet correct ingelezen.', domoticz.LOG_ERROR)
+--            return
+--        end
+
+        domoticz.log('PowerExport: ' .. PowerExport .. ', SensorBespaarvat: ' .. SensorBespaarvat, domoticz.LOG_INFO)
+
+        if Element.state == 'Off' and PowerExport > 2750 and SensorBespaarvat <= 75 then
+            Element.switchOn()
+            domoticz.log('Element ingeschakeld.', domoticz.LOG_INFO)
+
+        elseif Element.state == 'On' and (PowerExport <= 50 or SensorBespaarvat > 75) then
+            Element.switchOff()
+            domoticz.log('Element uitgeschakeld.', domoticz.LOG_INFO)
+        end
+    end
+}
