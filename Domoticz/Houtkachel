@@ -1,0 +1,66 @@
+return {
+    on = {
+        devices = { 'Houtkachel' },
+        timer = { 'every minute' }
+    },
+
+    data = {
+        pompUitTimer = { initial = '' }
+    },
+
+    execute = function(domoticz)
+        local tempHoutkachel = domoticz.devices('Houtkachel').temperature
+        local pomp = domoticz.devices('Pomp Houtkachel')
+
+        local now = os.time()
+        local hystereseGrens = 58
+        local aanGrens = 60
+        local delaySeconds = 120  -- 2 minuten
+
+        domoticz.log('--- Controle Houtkachel ---', domoticz.LOG_INFO)
+        domoticz.log('Temperatuur Houtkachel: ' .. tempHoutkachel .. '°C', domoticz.LOG_INFO)
+        domoticz.log('Pompstatus: ' .. (pomp.active and 'AAN' or 'UIT'), domoticz.LOG_INFO)
+
+        -- AAN: direct bij > 60°C
+        if tempHoutkachel > aanGrens then
+            if not pomp.active then
+                domoticz.log('Houtkachel > 60°C, pomp wordt direct aangezet.', domoticz.LOG_INFO)
+                pomp.switchOn()
+            else
+                domoticz.log('Houtkachel > 60°C, pomp staat al aan.', domoticz.LOG_DEBUG)
+            end
+            domoticz.data.pompUitTimer = ''  -- reset timer
+            return
+        end
+
+        -- UIT: bij < 58°C of < Aanvoer, met 2 min vertraging
+        if tempHoutkachel < hystereseGrens then
+            if pomp.active then
+                if domoticz.data.pompUitTimer == '' then
+                    domoticz.data.pompUitTimer = now
+                    domoticz.log('Uitschakelvoorwaarde gedetecteerd, timer gestart.', domoticz.LOG_INFO)
+                else
+                    local elapsed = now - tonumber(domoticz.data.pompUitTimer)
+                    domoticz.log('Uitschakelvoorwaarde actief sinds ' .. elapsed .. 's.', domoticz.LOG_INFO)
+                    if elapsed >= delaySeconds then
+                        domoticz.log('Voorwaarde > 2 minuten actief → pomp wordt uitgezet.', domoticz.LOG_INFO)
+                        pomp.switchOff()
+                        domoticz.data.pompUitTimer = ''
+                    else
+                        domoticz.log('Nog wachten: ' .. (delaySeconds - elapsed) .. 's tot uitschakeling.', domoticz.LOG_INFO)
+                    end
+                end
+            else
+                domoticz.log('Pomp staat al uit, geen actie nodig.', domoticz.LOG_DEBUG)
+            end
+        else
+            -- Voorwaarde niet meer geldig
+            if domoticz.data.pompUitTimer ~= '' then
+                domoticz.log('Uitschakelvoorwaarde niet meer geldig, timer wordt gereset.', domoticz.LOG_INFO)
+                domoticz.data.pompUitTimer = ''
+            else
+                domoticz.log('Geen uitschakelvoorwaarde actief, niets doen.', domoticz.LOG_DEBUG)
+            end
+        end
+    end
+}
