@@ -1,0 +1,49 @@
+return {
+    active = true,
+    on = {
+        devices = {
+            'VatOnder',
+            'Pomp Zonneboiler'
+        },
+        timer = {
+            'every minute'
+        }
+    },
+
+    execute = function(domoticz)
+        local vatBoven = domoticz.devices('VatOnder')
+        local palletKachel = domoticz.devices('Pallet kachel')
+        local pompZonneboiler = domoticz.devices('Pomp Zonneboiler')
+
+        local hour = domoticz.time.hour
+        local minute = domoticz.time.minutes
+
+        -- Uitschakelen als Pomp Zonneboiler aan is
+        if pompZonneboiler.state == 'On' and palletKachel.state == 'On' then
+            domoticz.log('Pomp Zonneboiler is aan, Pallet kachel wordt uitgezet', domoticz.LOG_INFO)
+            palletKachel.switchOff()
+            return
+        end
+
+        -- Uitschakelen als VatBoven >= 60
+        if vatBoven.temperature >= 60 and palletKachel.state == 'On' then
+            domoticz.log('VatOnder is 60°C of hoger, Pallet kachel wordt uitgezet', domoticz.LOG_INFO)
+            palletKachel.switchOff()
+            return
+        end
+
+        -- Aanzetten om 08:00 of 16:00 als VatOnder < 60 en Pomp niet aan is
+        if ( (hour == 9 or hour == 16) and minute == 0 ) then
+            if vatBoven.temperature < 60 then
+                if pompZonneboiler.state == 'Off' and palletKachel.state == 'Off' then
+                    domoticz.log('Tijdstip: '..hour..':00 en VatOnder < 60°C, Pallet kachel wordt aangezet', domoticz.LOG_INFO)
+                    palletKachel.switchOn()
+                else
+                    domoticz.log('Pallet kachel niet aangezet: Pomp draait of al aan', domoticz.LOG_INFO)
+                end
+            else
+                domoticz.log('VatOnder is 60°C of hoger om '..hour..':00, kachel blijft uit', domoticz.LOG_INFO)
+            end
+        end
+    end
+}
