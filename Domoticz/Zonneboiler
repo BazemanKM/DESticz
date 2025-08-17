@@ -1,0 +1,40 @@
+return {
+    on = {
+        devices = { 'Zonneboiler', 'Pomp Zonneboiler', 'VatOnder' }
+    },
+
+    execute = function(domoticz, item, info)
+        local Time = require('Time')
+        local currentTime = Time()
+        local isDag = currentTime.matchesRule("between 8:30 and 40 minutes before sunset")
+
+        -- Sensorwaarden ophalen
+        local function getSensorValue(deviceName)
+            local device = domoticz.devices(deviceName)
+            return device and tonumber(device.rawData[1]) or nil
+        end
+
+        local SensorOnder = getSensorValue('VatOnder') or 0
+        local SensorZonneboiler = getSensorValue('Zonneboiler') or 0
+        local DeltaT1 = SensorZonneboiler - SensorOnder
+        local Pomp = domoticz.devices('Pomp Zonneboiler')
+
+
+        -- Log als een sensorwaarde niet beschikbaar is
+        if not SensorOnder or not SensorZonneboiler then
+            domoticz.log("⚠️ Waarschuwing: Eén of meerdere sensorwaarden ontbreken!", domoticz.LOG_ERROR)
+            domoticz.notify("Pomp", "⚠️ Waarschuwing: Eén of meerdere sensorwaarden zonneboiler script ontbreken!", domoticz.PRIORITY_NORMAL, domoticz.SOUND_DEFAULT)
+        end
+
+        -- Controle of de pomp moet inschakelen
+        if Pomp.state == 'Off' and isDag and DeltaT1 > 5 then
+            Pomp.switchOn()
+            domoticz.log('✅ Pomp zonneboiler ingeschakeld.', domoticz.LOG_INFO)
+
+        elseif Pomp.state == 'On' and DeltaT1 <= 5 then
+            Pomp.switchOff()
+            domoticz.log('⛔ Pomp zonneboiler uitgeschakeld.', domoticz.LOG_INFO)
+
+        end
+    end
+}
